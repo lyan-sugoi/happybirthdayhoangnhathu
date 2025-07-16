@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Đăng nhập / Đăng ký</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #74ebd5 0%, #ACB6E5 100%);
+      min-height: 100vh;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 6px 32px rgba(0,0,0,0.10);
+      padding: 40px 32px 32px 32px;
+      width: 340px;
+      max-width: 90vw;
+      text-align: center;
+      transition: box-shadow 0.3s;
+    }
+    .container h2 {
+      margin-bottom: 16px;
+      color: #374151;
+    }
+    .container input[type="text"],
+    .container input[type="password"] {
+      width: 90%;
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      border: 1px solid #cfcfcf;
+      border-radius: 7px;
+      outline: none;
+      font-size: 15px;
+      transition: border-color 0.2s;
+    }
+    .container input[type="text"]:focus,
+    .container input[type="password"]:focus {
+      border-color: #74ebd5;
+    }
+    .container button {
+      padding: 10px 28px;
+      background: linear-gradient(90deg, #74ebd5 40%, #ACB6E5 100%);
+      border: none;
+      border-radius: 7px;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: background 0.2s, filter 0.2s;
+    }
+    .container button:hover {
+      filter: brightness(0.95);
+    }
+    .switch-link {
+      color: #5ab9ea;
+      cursor: pointer;
+      text-decoration: underline;
+      font-size: 14px;
+    }
+    .error-message {
+      color: #e74c3c;
+      margin-bottom: 12px;
+      font-size: 14px;
+      min-height: 18px;
+    }
+    .success-message {
+      color: #27ae60;
+      margin-bottom: 12px;
+      font-size: 14px;
+      min-height: 18px;
+    }
+    @media (max-width: 400px) {
+      .container {
+        padding: 24px 10px;
+      }
+    }
+
+    /* Trang Lyan Sugoi */
+    .lyan-sugoi-page {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      background: #fff;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .wave-text {
+      font-size: 2.5rem;
+      color: #222;
+      letter-spacing: 2px;
+      font-weight: bold;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 80px;
+      overflow: visible;
+    }
+    .wave-text span {
+      display: inline-block;
+      animation: wave 1.5s infinite;
+      animation-delay: calc(var(--i) * 0.13s);
+    }
+    @keyframes wave {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      18% {
+        transform: translateY(-18px);
+      }
+      38% {
+        transform: translateY(0);
+      }
+      48% {
+        transform: translateY(10px);
+      }
+      68% {
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="auth-container">
+    <h2 id="form-title">Đăng nhập</h2>
+    <form id="login-form" autocomplete="off">
+      <input type="text" id="login-username" placeholder="Tên đăng nhập" required>
+      <input type="password" id="login-password" placeholder="Mật khẩu" required>
+      <div class="error-message" id="login-error"></div>
+      <div class="success-message" id="login-success"></div>
+      <button type="submit">Đăng nhập</button>
+      <div style="margin-top:12px;">
+        Bạn chưa có tài khoản?
+        <span class="switch-link" id="to-register">Đăng ký</span>
+      </div>
+    </form>
+    <form id="register-form" style="display:none" autocomplete="off">
+      <input type="text" id="register-username" placeholder="Tên đăng nhập" required>
+      <input type="password" id="register-password" placeholder="Mật khẩu" required>
+      <input type="password" id="register-password2" placeholder="Nhập lại mật khẩu" required>
+      <div class="error-message" id="register-error"></div>
+      <button type="submit">Đăng ký</button>
+      <div style="margin-top:12px;">
+        Đã có tài khoản?
+        <span class="switch-link" id="to-login">Đăng nhập</span>
+      </div>
+    </form>
+  </div>
+
+  <div class="lyan-sugoi-page" id="lyan-sugoi-page">
+    <div class="wave-text" id="wave-text"></div>
+  </div>
+
+  <script>
+    // Lưu user vào localStorage (demo, không bảo mật)
+    function saveUser(username, password) {
+      localStorage.setItem("demo-user", JSON.stringify({ username, password }));
+    }
+    function getUser() {
+      const data = localStorage.getItem("demo-user");
+      if (!data) return null;
+      try { return JSON.parse(data); } catch { return null; }
+    }
+
+    // Chuyển đổi giữa form
+    const loginForm = document.getElementById('login-form');
+    const registerForm = document.getElementById('register-form');
+    const loginError = document.getElementById('login-error');
+    const registerError = document.getElementById('register-error');
+    const loginSuccess = document.getElementById('login-success');
+    const formTitle = document.getElementById('form-title');
+
+    document.getElementById('to-register').onclick = () => {
+      loginForm.style.display = "none";
+      registerForm.style.display = "block";
+      formTitle.textContent = "Đăng ký";
+      loginError.textContent = "";
+      loginSuccess.textContent = "";
+      registerError.textContent = "";
+    };
+    document.getElementById('to-login').onclick = () => {
+      registerForm.style.display = "none";
+      loginForm.style.display = "block";
+      formTitle.textContent = "Đăng nhập";
+      registerError.textContent = "";
+      loginError.textContent = "";
+      loginSuccess.textContent = "";
+    };
+
+    // Xử lý đăng ký
+    registerForm.onsubmit = function(e) {
+      e.preventDefault();
+      registerError.textContent = "";
+      const username = document.getElementById('register-username').value.trim();
+      const password = document.getElementById('register-password').value;
+      const password2 = document.getElementById('register-password2').value;
+      if (!username || !password) {
+        registerError.textContent = "Vui lòng nhập đầy đủ thông tin.";
+        return;
+      }
+      if (password !== password2) {
+        registerError.textContent = "Mật khẩu nhập lại không khớp.";
+        return;
+      }
+      // Kiểm tra đã có tài khoản chưa
+      const user = getUser();
+      if (user && user.username === username) {
+        registerError.textContent = "Tên đăng nhập đã tồn tại. Hãy chọn tên khác.";
+        return;
+      }
+      saveUser(username, password);
+      // Chuyển luôn về form đăng nhập và báo thành công
+      registerForm.style.display = "none";
+      loginForm.style.display = "block";
+      formTitle.textContent = "Đăng nhập";
+      loginSuccess.textContent = "Đăng ký thành công! Hãy đăng nhập để tiếp tục.";
+      // Reset trường nhập đăng ký
+      document.getElementById('register-username').value = "";
+      document.getElementById('register-password').value = "";
+      document.getElementById('register-password2').value = "";
+    };
+
+    // Xử lý đăng nhập
+    loginForm.onsubmit = function(e) {
+      e.preventDefault();
+      loginError.textContent = "";
+      loginSuccess.textContent = "";
+      const username = document.getElementById('login-username').value.trim();
+      const password = document.getElementById('login-password').value;
+      const user = getUser();
+      if (!user) {
+        loginError.textContent = "Bạn chưa có tài khoản! Hãy đăng ký trước.";
+        return;
+      }
+      if (username !== user.username || password !== user.password) {
+        loginError.textContent = "Tên đăng nhập hoặc mật khẩu sai!";
+        return;
+      }
+      loginError.textContent = "";
+      loginSuccess.textContent = "";
+      showLyanSugoiPage();
+    };
+
+    // Trang Lyan Sugoi với hiệu ứng sóng
+    function showLyanSugoiPage() {
+      document.getElementById('auth-container').style.display = 'none';
+      const page = document.getElementById('lyan-sugoi-page');
+      page.style.display = 'flex';
+
+      // Hiệu ứng sóng cho từng ký tự
+      const text = "Lyan Sugoi";
+      const waveText = document.getElementById('wave-text');
+      waveText.innerHTML = "";
+      for (let i = 0; i < text.length; i++) {
+        const span = document.createElement('span');
+        span.textContent = text[i] === " " ? "\u00A0" : text[i];
+        span.style.setProperty('--i', i);
+        waveText.appendChild(span);
+      }
+    }
+  </script>
+</body>
+</html>
