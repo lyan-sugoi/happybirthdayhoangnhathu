@@ -7,6 +7,8 @@
   <!-- fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
   <style>
     body {
       margin: 0; min-height: 100vh; display: grid; place-items: center;
@@ -62,14 +64,13 @@
     </footer>
   </div>
 
-  <audio id="audio" src="birthday.mp3"></audio> <!-- đổi thành link mp3 của bạn -->
+  <!-- đổi src thành file mp3 của bạn -->
+  <audio id="audio" src="birthday.mp3"></audio>
 
+  <!-- JavaScript -->
   <script>
     // Counter (cố định 73 ngày)
-    function updateCounter() {
-      document.getElementById('counter').textContent = `Chúng ta đã bên nhau: 73 ngày`;
-    }
-    updateCounter();
+    document.getElementById('counter').textContent = `Chúng ta đã bên nhau: 73 ngày`;
 
     // Audio
     const audio = document.getElementById('audio');
@@ -95,36 +96,4 @@
           x:x,y:y,
           vx:Math.cos(i*0.1047)*Math.random()*4,
           vy:Math.sin(i*0.1047)*Math.random()*4,
-          alpha:1
-        });
-      }
-    }
-    Firework.prototype.draw=function(){
-      for(const p of this.particles){
-        ctx.fillStyle=this.color;
-        ctx.globalAlpha=p.alpha;
-        ctx.fillRect(p.x,p.y,2,2);
-      }
-      ctx.globalAlpha=1;
-    }
-    Firework.prototype.update=function(){
-      for(const p of this.particles){
-        p.x+=p.vx; p.y+=p.vy; p.vy+=0.02;
-        p.alpha-=0.02;
-      }
-    }
-
-    let fireworks=[];
-    function animate(){
-      ctx.clearRect(0,0,W,H);
-      for(const f of fireworks){ f.update(); f.draw(); }
-      requestAnimationFrame(animate);
-    }
-    animate();
-
-    function launchFireworks(){
-      const colors=["#ff0000","#00ff00","#0000ff","#ffff00","#ff00ff","#00ffff"];
-      for(let i=0;i<6;i++){
-        fireworks.push(new Firework(Math.random()*W,Math.random()*H/2,colors[i]));
-      }
-      setTimeout(()=>{ fireworks=[]; ctx.clearRect
+          alpha
