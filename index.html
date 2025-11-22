@@ -4,142 +4,34 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Happy Birthday 💖</title>
-  <!-- fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
   <style>
-    body {
-      margin: 0; min-height: 100vh; display: grid; place-items: center;
-      background: radial-gradient(1000px 600px at 80% -100%, #ffe0ec, transparent),
-                  radial-gradient(800px 500px at -10% 120%, #e6f7ff, transparent),
-                  #fff6f9;
-      font-family: Inter, sans-serif;
-      color: #000;
-    }
-    .card {
-      width: min(700px, 92vw); background: #fff; border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.08); overflow: hidden;
-      position: relative; animation: float 8s ease-in-out infinite;
-      z-index: 2;
-    }
-    header { padding: 28px; }
-    h1 { font-family: "Playfair Display", serif; margin: 0; font-size: 32px; }
-    .content { padding: 24px }
-    .message { font-size: 18px; line-height: 1.7; opacity: 0; transform: translateY(6px); animation: fadeIn 900ms ease forwards 800ms }
-    .cta { margin-top: 18px }
-    button {
-      padding: 10px 14px; border-radius: 12px; border: 1px solid #ccc; background: #fff;
-      color: #000; font-weight: 600; cursor: pointer;
-    }
-    .counter { margin-top: 18px; font-size: 14px; }
-    footer { padding: 16px 28px; font-size: 13px; }
-    @keyframes float { 0%,100%{ transform: translateY(0)} 50%{ transform: translateY(-6px)} }
-    @keyframes fadeIn { to{ opacity:1; transform: translateY(0)} }
-    canvas { position: fixed; inset: 0; pointer-events: none; z-index: 3 }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; font-family:sans-serif; }
+    .card { background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 20px rgba(0,0,0,.2); }
+    button { margin:5px; padding:8px 12px; }
   </style>
 </head>
 <body>
-  <canvas id="fireworks"></canvas>
-
   <div class="card">
-    <header>
-      <h1>Chúc mừng sinh nhật, Em!</h1>
-    </header>
-    <div class="content">
-      <div class="message">
-        Mỗi lần nghĩ về em, thế giới trở nên nhẹ nhàng hơn một chút.
-        Chúc em tuổi mới thật dịu dàng, rực rỡ, và luôn được yêu thương nhó bb nhó 💖
-      </div>
-      <div class="cta">
-        <button id="play">Bật nhạc</button>
-        <button id="reveal">Bí mật nhỏ</button>
-      </div>
-      <div class="counter" id="counter">Chúng ta đã bên nhau: 73 ngày</div>
-    </div>
-    <footer>
-      <span>Ngày đặc biệt: 22/11</span>
-      <span>made with love from Vinh - your silly but sweet man ✨</span>
-    </footer>
+    <h1>Chúc mừng sinh nhật, em!</h1>
+    <p>Mỗi lần nghĩ về em, thế giới trở nên nhẹ nhàng hơn một chút 💖</p>
+    <button id="play">Bật nhạc</button>
+    <button id="reveal">Bí mật nhỏ</button>
+    <p id="counter">Chúng ta đã bên nhau: 73 ngày</p>
   </div>
 
-  <!-- Đổi src thành file mp3 của bạn -->
   <audio id="audio" src="https://cdn.discordapp.com/attachments/1411796891360034930/1441652842749362268/v24044gl0000d3fe87vog65l7ac7t2qg.mp3?ex=69229356&is=692141d6&hm=c9838c3ed6b5376e589d0cad8f14624168c2e28b7dcce590471a576941182620&"></audio>
 
   <script>
-    // Counter
-    document.getElementById('counter').textContent = `Chúng ta đã bên nhau: 73 ngày`;
-
-    // Audio
+    // Nút bật nhạc
     const audio = document.getElementById('audio');
     document.getElementById('play').onclick = async () => {
-      try {
-        if (audio.paused) {
-          await audio.play();
-        } else {
-          audio.pause();
-        }
-      } catch (e) {
-        alert("Không phát được nhạc, kiểm tra lại link mp3!");
-      }
+      if (audio.paused) { await audio.play(); } else { audio.pause(); }
     };
 
-    // Bí mật nhỏ
+    // Nút bí mật nhỏ
     document.getElementById('reveal').onclick = () => {
       alert("Vô nick em đi, có bất ngờ á :3 ");
     };
-
-    // Fireworks
-    const canvas = document.getElementById('fireworks');
-    const ctx = canvas.getContext('2d');
-    let W = canvas.width = window.innerWidth;
-    let H = canvas.height = window.innerHeight;
-    window.addEventListener('resize', ()=>{ W=canvas.width=innerWidth; H=canvas.height=innerHeight; });
-
-    function Firework(x,y,color){
-      this.x=x; this.y=y; this.color=color;
-      this.particles=[];
-      for(let i=0;i<60;i++){
-        this.particles.push({
-          x:x,y:y,
-          vx:Math.cos(i*0.1047)*Math.random()*4,
-          vy:Math.sin(i*0.1047)*Math.random()*4,
-          alpha:1
-        });
-      }
-    }
-    Firework.prototype.draw=function(){
-      for(const p of this.particles){
-        ctx.fillStyle=this.color;
-        ctx.globalAlpha=p.alpha;
-        ctx.fillRect(p.x,p.y,2,2);
-      }
-      ctx.globalAlpha=1;
-    }
-    Firework.prototype.update=function(){
-      for(const p of this.particles){
-        p.x+=p.vx; p.y+=p.vy; p.vy+=0.02;
-        p.alpha-=0.02;
-      }
-    }
-
-    let fireworks=[];
-    function animate(){
-      ctx.clearRect(0,0,W,H);
-      for(const f of fireworks){ f.update(); f.draw(); }
-      requestAnimationFrame(animate);
-    }
-    animate();
-
-    function launchFireworks(){
-      const colors=["#ff0000","#00ff00","#0000ff","#ffff00","#ff00ff","#00ffff"];
-      for(let i=0;i<6;i++){
-        fireworks.push(new Firework(Math.random()*W,Math.random()*H/2,colors[i]));
-      }
-      setTimeout(()=>{ fireworks=[]; ctx.clearRect(0,0,W,H); },6000);
-    }
-
-    window.onload=launchFireworks;
   </script>
 </body>
 </html>
